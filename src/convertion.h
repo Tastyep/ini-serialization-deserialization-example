@@ -26,6 +26,11 @@ std::expected<void, ConversionError> convert(std::string_view input, int &obj) {
   return {};
 }
 
+std::expected<void, ConversionError> convert(int input, std::string &obj) {
+  obj = std::to_string(input);
+  return {};
+}
+
 template <class Input, class Value>
   requires std::assignable_from<std::add_lvalue_reference_t<Value>, Input>
 std::expected<void, ConversionError> convert(const Input &input, Value &obj) {
@@ -49,10 +54,40 @@ convert(const std::map<std::string, Value> &input, T &obj) {
   return result;
 }
 
+template <class Value, //
+          class T, class Md = bd::describe_members<T, bd::mod_any_access>>
+std::expected<void, ConversionError>
+convert(const T &obj, std::map<std::string, Value> &input) {
+  std::expected<void, ConversionError> result;
+
+  boost::mp11::mp_for_each<Md>([&](auto D) {
+    if (!result) {
+      return;
+    }
+    result = convert(obj.*D.pointer, input[D.name]);
+  });
+
+  return result;
+}
+
 template <class T, class Bd = bd::describe_bases<T, bd::mod_any_access>,
           class Md = bd::describe_members<T, bd::mod_any_access>, class Input>
 std::expected<T, ConversionError> convert(const Input &input) {
   T obj{};
+
+  auto result = convert(input, obj);
+  if (!result) {
+    return std::unexpected(result.error());
+  }
+
+  return {obj};
+}
+
+template <class Output, class T,
+          class Bd = bd::describe_bases<T, bd::mod_any_access>,
+          class Md = bd::describe_members<T, bd::mod_any_access>>
+std::expected<Output, ConversionError> convert(const T &input) {
+  Output obj{};
 
   auto result = convert(input, obj);
   if (!result) {

@@ -11,14 +11,19 @@ int main(void) {
     return 1;
   }
 
-  const auto example = convert<Example>(*iniContent);
+  auto example = convert<Example>(*iniContent);
   if (!example) {
     std::cerr << example.error() << std::endl;
     return 1;
   }
 
-  const auto wrote =
-      ini::write(*iniContent, std::filesystem::path{"../output/example.ini"});
+  example->numbers.two = 9;
+  example->letters.c = "z";
+
+  const auto newIniContent = convert<ini::Content>(*example);
+
+  const auto wrote = ini::write(*newIniContent,
+                                std::filesystem::path{"../output/example.ini"});
   if (!wrote) {
     std::cerr << wrote.error() << std::endl;
     return 1;
