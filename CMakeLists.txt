@@ -4,8 +4,9 @@ project(IniSerDeser)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(DEPS_BOOST_LIBRARIES describe mp11)
 include(cmake/FetchBoost.cmake)
-find_package(Boost REQUIRED COMPONENTS describe)
+find_package(Boost REQUIRED COMPONENTS ${DEPS_BOOST_LIBRARIES})
 
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE src/main.cpp src/ini.cpp src/ini.h src/string.h)
