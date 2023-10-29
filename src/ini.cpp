@@ -4,8 +4,8 @@
 #include <exception>
 #include <format>
 #include <fstream>
-#include <iostream>
 #include <string>
+
 namespace ini {
 
 std::expected<Content, std::string> read(const std::filesystem::path &path) {
@@ -43,14 +43,31 @@ std::expected<Content, std::string> read(const std::filesystem::path &path) {
     const auto key = trim(line.substr(0, sepIdx));
     const auto value = trim(line.substr(sepIdx + 1));
     content[sectionName][key] = value;
-    std::cout << key << " " << value << std::endl;
   }
 
   return content;
 }
 
 std::expected<void, std::string> write(const Content &content,
-                                       std::filesystem::path &path) {
+                                       const std::filesystem::path &path) {
+  std::ofstream file{path};
+  if (!file.is_open()) {
+    return std::unexpected(
+        std::format("Cannot write the file '{}'", path.string()));
+  }
+
+  const auto lastSectionName = std::prev(content.end())->first;
+  for (const auto &[sectionName, section] : content) {
+    file << std::format("[{}]\n", sectionName);
+    for (const auto &[key, value] : section) {
+      file << std::format("{} = {}\n", key, value);
+    }
+
+    if (sectionName != lastSectionName) {
+      file << std::endl;
+    }
+  }
+
   return {};
 }
 
