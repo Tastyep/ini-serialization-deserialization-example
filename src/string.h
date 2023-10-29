@@ -12,7 +12,7 @@
   return std::ranges::any_of(ws, [q](auto p) { return p == q; });
 };
 
-[[nodiscard]] constexpr std::string trim(std::string_view const in) {
+[[nodiscard]] constexpr std::string trim(const std::string_view in) {
   auto view = in | std::views::drop_while(isSpace) | std::views::reverse |
               std::views::drop_while(isSpace) | std::views::reverse;
   return {view.begin(), view.end()};
