@@ -1,11 +1,17 @@
 #include "convertion.h"
 #include "example.h"
+#include "file.h"
 #include "ini.h"
 #include <iostream>
 
 int main(void) {
-  const auto iniContent =
-      ini::read(std::filesystem::path{"../asset/example.ini"});
+  auto iniFile = openInputFile(std::filesystem::path{"../asset/example.ini"});
+  if (!iniFile) {
+    std::cerr << iniFile.error() << std::endl;
+    return 1;
+  }
+
+  const auto iniContent = ini::read(**iniFile);
   if (!iniContent) {
     std::cerr << iniContent.error() << std::endl;
     return 1;
@@ -22,8 +28,14 @@ int main(void) {
 
   const auto newIniContent = convert<ini::Content>(*example);
 
-  const auto wrote = ini::write(*newIniContent,
-                                std::filesystem::path{"../output/example.ini"});
+  auto outputFile =
+      openOutputFile(std::filesystem::path{"../output/example.ini"});
+  if (!outputFile) {
+    std::cerr << outputFile.error() << std::endl;
+    return 1;
+  }
+
+  const auto wrote = ini::write(*newIniContent, **outputFile);
   if (!wrote) {
     std::cerr << wrote.error() << std::endl;
     return 1;

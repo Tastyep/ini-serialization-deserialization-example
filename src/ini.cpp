@@ -8,18 +8,12 @@
 
 namespace ini {
 
-std::expected<Content, std::string> read(const std::filesystem::path &path) {
-  std::ifstream file{path};
-  if (!file.is_open()) {
-    return std::unexpected(
-        std::format("Cannot read the file '{}'", path.string()));
-  }
-
+std::expected<Content, std::string> read(std::istream &input) {
   Content content;
   std::string sectionName;
 
   std::string line;
-  while (std::getline(file, line)) {
+  while (std::getline(input, line)) {
     if (line.empty()) {
       continue;
     }
@@ -49,13 +43,7 @@ std::expected<Content, std::string> read(const std::filesystem::path &path) {
 }
 
 std::expected<void, std::string> write(const Content &content,
-                                       const std::filesystem::path &path) {
-  std::ofstream file{path};
-  if (!file.is_open()) {
-    return std::unexpected(
-        std::format("Cannot write the file '{}'", path.string()));
-  }
-
+                                       std::ostream &file) {
   const auto lastSectionName = std::prev(content.end())->first;
   for (const auto &[sectionName, section] : content) {
     file << std::format("[{}]\n", sectionName);

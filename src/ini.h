@@ -2,7 +2,7 @@
 #define INI_H
 
 #include <expected>
-#include <filesystem>
+#include <istream>
 #include <map>
 #include <string>
 
@@ -10,9 +10,9 @@ namespace ini {
 
 using Content = std::map<std::string, std::map<std::string, std::string>>;
 
-std::expected<Content, std::string> read(const std::filesystem::path &path);
+std::expected<Content, std::string> read(std::istream &file);
 std::expected<void, std::string> write(const Content &content,
-                                       const std::filesystem::path &path);
+                                       std::ostream &file);
 
 } // namespace ini
 
