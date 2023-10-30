@@ -7,12 +7,18 @@
 #include <string>
 #include <string_view>
 
-[[nodiscard]] constexpr bool isSpace(char q) noexcept {
+[[nodiscard]] constexpr bool isSpace(char q) noexcept
+{
   static constexpr auto ws = {' ', '\t', '\n', '\v', '\r', '\f'};
-  return std::ranges::any_of(ws, [q](auto p) { return p == q; });
+  return std::ranges::any_of(ws,
+                             [q](auto p)
+                             {
+                               return p == q;
+                             });
 };
 
-[[nodiscard]] constexpr std::string trim(const std::string_view in) {
+[[nodiscard]] constexpr std::string trim(const std::string_view in)
+{
   auto view = in | std::views::drop_while(isSpace) | std::views::reverse |
               std::views::drop_while(isSpace) | std::views::reverse;
   return {view.begin(), view.end()};

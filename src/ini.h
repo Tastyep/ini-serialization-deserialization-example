@@ -6,13 +6,14 @@
 #include <map>
 #include <string>
 
-namespace ini {
+namespace ini
+{
 
 using Content = std::map<std::string, std::map<std::string, std::string>>;
 
 std::expected<Content, std::string> read(std::istream &file);
-std::expected<void, std::string> write(const Content &content,
-                                       std::ostream &file);
+std::expected<void, std::string>    write(const Content &content,
+                                          std::ostream  &file);
 
 } // namespace ini
 

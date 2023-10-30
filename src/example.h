@@ -4,16 +4,20 @@
 #include <boost/describe.hpp>
 #include <string>
 
-class Numbers {
-public:
+class Numbers
+{
+  public:
+
   int one;
   int two;
 
   BOOST_DESCRIBE_CLASS(Numbers, (), (), (), (one, two));
 };
 
-class Letters {
-public:
+class Letters
+{
+  public:
+
   std::string a;
   std::string b;
   std::string c;
@@ -21,8 +25,10 @@ public:
   BOOST_DESCRIBE_CLASS(Letters, (), (), (), (a, b, c));
 };
 
-class Example {
-public:
+class Example
+{
+  public:
+
   Numbers numbers;
   Letters letters;
 
