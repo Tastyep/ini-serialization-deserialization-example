@@ -2,6 +2,7 @@
 #define CONVERTION_H
 
 #include <array>
+#include <boost/core/demangle.hpp>
 #include <boost/describe.hpp>
 #include <charconv>
 #include <concepts>
@@ -19,6 +20,12 @@ using ConversionError = std::string;
 template <typename T>
 concept Number = std::integral<T> or std::floating_point<T>;
 
+template <typename T>
+std::string typeName()
+{
+  return boost::core::demangle(typeid(T).name());
+}
+
 std::expected<void, ConversionError> convert(std::string_view input,
                                              Number auto     &obj)
 {
@@ -26,13 +33,18 @@ std::expected<void, ConversionError> convert(std::string_view input,
   auto [ptr, ec]   = std::from_chars(input.data(), last, obj);
   if (ec != std::errc())
   {
-    return std::unexpected(std::format("'{}' cannot be converted: {}",
+    return std::unexpected(std::format("Cannot convert '{}' to '{}': {}",
                                        input,
+                                       typeName<decltype(obj)>(),
                                        std::make_error_code(ec).message()));
   }
-  if (ec == std::errc::invalid_argument || ptr != last)
+  if (ptr != last)
   {
-    return std::unexpected(std::format("'{}' is not a number", input));
+    return std::unexpected(
+        std::format("Cannot convert '{}' to '{}', '{}' is not a number",
+                    input,
+                    typeName<decltype(obj)>(),
+                    std::string_view(ptr, last)));
   }
 
   return {};
