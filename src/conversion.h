@@ -18,13 +18,42 @@ namespace bd          = boost::describe;
 using ConversionError = std::string;
 
 template<typename T>
-concept Number = std::integral<T> or std::floating_point<T>;
+concept Number =
+    (std::integral<T> || std::floating_point<T>)&&!std::same_as<bool, T>;
 
 template<typename T>
 std::string typeName()
 {
   return boost::core::demangle(typeid(T).name());
 }
+
+// Boolean
+
+std::expected<void, ConversionError> convert(std::string_view input, bool& obj)
+{
+  if (input == "ON")
+  {
+    obj = true;
+  }
+  else if (input == "OFF")
+  {
+    obj = false;
+  }
+  else
+  {
+    return std::unexpected(std::format("Cannot convert '{}' to bool", input));
+  }
+
+  return {};
+}
+
+std::expected<void, ConversionError> convert(bool input, std::string& obj)
+{
+  obj = input ? "True" : "False";
+  return {};
+}
+
+// Numbers
 
 std::expected<void, ConversionError> convert(std::string_view input,
                                              Number auto&     obj)
@@ -33,7 +62,7 @@ std::expected<void, ConversionError> convert(std::string_view input,
   auto [ptr, ec]   = std::from_chars(input.data(), last, obj);
   if (ec != std::errc())
   {
-    return std::unexpected(std::format("Cannot convert '{}' to '{}': {}",
+    return std::unexpected(std::format("Cannot convert '{}' to {}: {}",
                                        input,
                                        typeName<decltype(obj)>(),
                                        std::make_error_code(ec).message()));
@@ -41,7 +70,7 @@ std::expected<void, ConversionError> convert(std::string_view input,
   if (ptr != last)
   {
     return std::unexpected(
-        std::format("Cannot convert '{}' to '{}', '{}' is not a number",
+        std::format("Cannot convert '{}' to {}, '{}' is not a number",
                     input,
                     typeName<decltype(obj)>(),
                     std::string_view(ptr, last)));
@@ -65,6 +94,8 @@ std::expected<void, ConversionError> convert(Number auto  input,
   return {};
 }
 
+// Assignable
+
 template<class Input, class Value>
 requires std::assignable_from<std::add_lvalue_reference_t<Value>, Input>
 std::expected<void, ConversionError> convert(const Input& input, Value& obj)
@@ -72,6 +103,8 @@ std::expected<void, ConversionError> convert(const Input& input, Value& obj)
   obj = input;
   return {};
 }
+
+// Described
 
 template<class Value, //
          class Output,
@@ -114,6 +147,8 @@ convert(const Input& input, std::map<std::string, Value>& output)
 
   return result;
 }
+
+// Create & convert
 
 template<class Output,
          class Md = bd::describe_members<Output, bd::mod_any_access>,
