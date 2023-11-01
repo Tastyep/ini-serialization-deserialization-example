@@ -9,9 +9,9 @@
 #include <string>
 
 std::expected<std::unique_ptr<std::istream>, std::string>
-openInputFile(const std::filesystem::path &path);
+openInputFile(const std::filesystem::path& path);
 
 std::expected<std::unique_ptr<std::ostream>, std::string>
-openOutputFile(const std::filesystem::path &path);
+openOutputFile(const std::filesystem::path& path);
 
 #endif

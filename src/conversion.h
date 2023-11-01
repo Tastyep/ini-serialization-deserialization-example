@@ -17,19 +17,19 @@
 namespace bd          = boost::describe;
 using ConversionError = std::string;
 
-template <typename T>
+template<typename T>
 concept Number = std::integral<T> or std::floating_point<T>;
 
-template <typename T>
+template<typename T>
 std::string typeName()
 {
   return boost::core::demangle(typeid(T).name());
 }
 
 std::expected<void, ConversionError> convert(std::string_view input,
-                                             Number auto     &obj)
+                                             Number auto&     obj)
 {
-  const char *last = input.data() + input.size();
+  const char* last = input.data() + input.size();
   auto [ptr, ec]   = std::from_chars(input.data(), last, obj);
   if (ec != std::errc())
   {
@@ -51,7 +51,7 @@ std::expected<void, ConversionError> convert(std::string_view input,
 }
 
 std::expected<void, ConversionError> convert(Number auto  input,
-                                             std::string &obj)
+                                             std::string& obj)
 {
   std::array<char, 10> buffer;
   auto [ptr, ec] =
@@ -65,19 +65,19 @@ std::expected<void, ConversionError> convert(Number auto  input,
   return {};
 }
 
-template <class Input, class Value>
-  requires std::assignable_from<std::add_lvalue_reference_t<Value>, Input>
-std::expected<void, ConversionError> convert(const Input &input, Value &obj)
+template<class Input, class Value>
+requires std::assignable_from<std::add_lvalue_reference_t<Value>, Input>
+std::expected<void, ConversionError> convert(const Input& input, Value& obj)
 {
   obj = input;
   return {};
 }
 
-template <class Value, //
-          class Output,
-          class Md = bd::describe_members<Output, bd::mod_any_access>>
+template<class Value, //
+         class Output,
+         class Md = bd::describe_members<Output, bd::mod_any_access>>
 std::expected<void, ConversionError>
-convert(const std::map<std::string, Value> &input, Output &obj)
+convert(const std::map<std::string, Value>& input, Output& obj)
 {
   std::expected<void, ConversionError> result;
 
@@ -94,11 +94,11 @@ convert(const std::map<std::string, Value> &input, Output &obj)
   return result;
 }
 
-template <class Value, //
-          class Input,
-          class Md = bd::describe_members<Input, bd::mod_any_access>>
+template<class Value, //
+         class Input,
+         class Md = bd::describe_members<Input, bd::mod_any_access>>
 std::expected<void, ConversionError>
-convert(const Input &input, std::map<std::string, Value> &output)
+convert(const Input& input, std::map<std::string, Value>& output)
 {
   std::expected<void, ConversionError> result;
 
@@ -115,10 +115,10 @@ convert(const Input &input, std::map<std::string, Value> &output)
   return result;
 }
 
-template <class Output,
-          class Md = bd::describe_members<Output, bd::mod_any_access>,
-          class Input>
-std::expected<Output, ConversionError> convert(const Input &input)
+template<class Output,
+         class Md = bd::describe_members<Output, bd::mod_any_access>,
+         class Input>
+std::expected<Output, ConversionError> convert(const Input& input)
 {
   Output output{};
 
@@ -131,10 +131,10 @@ std::expected<Output, ConversionError> convert(const Input &input)
   return {output};
 }
 
-template <class Output,
-          class Input,
-          class Md = bd::describe_members<Input, bd::mod_any_access>>
-std::expected<Output, ConversionError> convert(const Input &input)
+template<class Output,
+         class Input,
+         class Md = bd::describe_members<Input, bd::mod_any_access>>
+std::expected<Output, ConversionError> convert(const Input& input)
 {
   Output output{};
 

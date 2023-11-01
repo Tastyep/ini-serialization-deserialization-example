@@ -4,7 +4,7 @@
 #include <fstream>
 
 std::expected<std::unique_ptr<std::istream>, std::string>
-openInputFile(const std::filesystem::path &path)
+openInputFile(const std::filesystem::path& path)
 {
   auto file = std::make_unique<std::ifstream>(path);
   if (!file->is_open())
@@ -17,7 +17,7 @@ openInputFile(const std::filesystem::path &path)
 }
 
 std::expected<std::unique_ptr<std::ostream>, std::string>
-openOutputFile(const std::filesystem::path &path)
+openOutputFile(const std::filesystem::path& path)
 {
   auto file = std::make_unique<std::ofstream>(path);
   if (!file->is_open())

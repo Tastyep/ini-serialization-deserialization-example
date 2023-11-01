@@ -10,7 +10,7 @@
 namespace ini
 {
 
-std::expected<Content, std::string> read(std::istream &input)
+std::expected<Content, std::string> read(std::istream& input)
 {
   Content     content;
   std::string sectionName;
@@ -50,14 +50,14 @@ std::expected<Content, std::string> read(std::istream &input)
   return content;
 }
 
-std::expected<void, std::string> write(const Content &content,
-                                       std::ostream  &file)
+std::expected<void, std::string> write(const Content& content,
+                                       std::ostream&  file)
 {
   const auto lastSectionName = std::prev(content.end())->first;
-  for (const auto &[sectionName, section] : content)
+  for (const auto& [sectionName, section] : content)
   {
     file << std::format("[{}]\n", sectionName);
-    for (const auto &[key, value] : section)
+    for (const auto& [key, value] : section)
     {
       file << std::format("{} = {}\n", key, value);
     }
