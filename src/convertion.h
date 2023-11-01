@@ -1,9 +1,11 @@
 #ifndef CONVERTION_H
 #define CONVERTION_H
 
+#include <array>
 #include <boost/describe.hpp>
 #include <charconv>
 #include <concepts>
+#include <exception>
 #include <expected>
 #include <format>
 #include <map>
@@ -14,7 +16,11 @@
 namespace bd          = boost::describe;
 using ConversionError = std::string;
 
-std::expected<void, ConversionError> convert(std::string_view input, int &obj)
+template <typename T>
+concept Number = std::integral<T> or std::floating_point<T>;
+
+std::expected<void, ConversionError> convert(std::string_view input,
+                                             Number auto     &obj)
 {
   const char *last = input.data() + input.size();
   auto [ptr, ec]   = std::from_chars(input.data(), last, obj);
@@ -30,9 +36,18 @@ std::expected<void, ConversionError> convert(std::string_view input, int &obj)
   return {};
 }
 
-std::expected<void, ConversionError> convert(int input, std::string &obj)
+std::expected<void, ConversionError> convert(Number auto  input,
+                                             std::string &obj)
 {
-  obj = std::to_string(input);
+  std::array<char, 10> buffer;
+  auto [ptr, ec] =
+      std::to_chars(buffer.data(), buffer.data() + buffer.size(), input);
+  if (ec != std::errc())
+  {
+    return std::unexpected(std::make_error_code(ec).message());
+  }
+
+  obj = std::string_view(buffer.data(), ptr);
   return {};
 }
 

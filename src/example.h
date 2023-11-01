@@ -8,10 +8,11 @@ class Numbers
 {
   public:
 
-  int one;
-  int two;
+  int   one;
+  int   two;
+  float three;
 
-  BOOST_DESCRIBE_CLASS(Numbers, (), (), (), (one, two));
+  BOOST_DESCRIBE_CLASS(Numbers, (), (), (), (one, two, three));
 };
 
 class Letters
