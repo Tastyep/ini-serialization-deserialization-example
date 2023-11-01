@@ -24,13 +24,15 @@ std::expected<void, ConversionError> convert(std::string_view input,
 {
   const char *last = input.data() + input.size();
   auto [ptr, ec]   = std::from_chars(input.data(), last, obj);
+  if (ec != std::errc())
+  {
+    return std::unexpected(std::format("'{}' cannot be converted: {}",
+                                       input,
+                                       std::make_error_code(ec).message()));
+  }
   if (ec == std::errc::invalid_argument || ptr != last)
   {
     return std::unexpected(std::format("'{}' is not a number", input));
-  }
-  else if (ec == std::errc::result_out_of_range)
-  {
-    return std::unexpected(std::format("'{}' is larger than an int", input));
   }
 
   return {};
@@ -60,10 +62,10 @@ std::expected<void, ConversionError> convert(const Input &input, Value &obj)
 }
 
 template <class Value, //
-          class T,
-          class Md = bd::describe_members<T, bd::mod_any_access>>
+          class Output,
+          class Md = bd::describe_members<Output, bd::mod_any_access>>
 std::expected<void, ConversionError>
-convert(const std::map<std::string, Value> &input, T &obj)
+convert(const std::map<std::string, Value> &input, Output &obj)
 {
   std::expected<void, ConversionError> result;
 
@@ -81,10 +83,10 @@ convert(const std::map<std::string, Value> &input, T &obj)
 }
 
 template <class Value, //
-          class T,
-          class Md = bd::describe_members<T, bd::mod_any_access>>
+          class Input,
+          class Md = bd::describe_members<Input, bd::mod_any_access>>
 std::expected<void, ConversionError>
-convert(const T &obj, std::map<std::string, Value> &input)
+convert(const Input &input, std::map<std::string, Value> &output)
 {
   std::expected<void, ConversionError> result;
 
@@ -95,44 +97,42 @@ convert(const T &obj, std::map<std::string, Value> &input)
         {
           return;
         }
-        result = convert(obj.*D.pointer, input[D.name]);
+        result = convert(input.*D.pointer, output[D.name]);
       });
 
   return result;
 }
 
-template <class T,
-          class Bd = bd::describe_bases<T, bd::mod_any_access>,
-          class Md = bd::describe_members<T, bd::mod_any_access>,
+template <class Output,
+          class Md = bd::describe_members<Output, bd::mod_any_access>,
           class Input>
-std::expected<T, ConversionError> convert(const Input &input)
+std::expected<Output, ConversionError> convert(const Input &input)
 {
-  T obj{};
+  Output output{};
 
-  auto result = convert(input, obj);
+  auto result = convert(input, output);
   if (!result)
   {
     return std::unexpected(result.error());
   }
 
-  return {obj};
+  return {output};
 }
 
 template <class Output,
-          class T,
-          class Bd = bd::describe_bases<T, bd::mod_any_access>,
-          class Md = bd::describe_members<T, bd::mod_any_access>>
-std::expected<Output, ConversionError> convert(const T &input)
+          class Input,
+          class Md = bd::describe_members<Input, bd::mod_any_access>>
+std::expected<Output, ConversionError> convert(const Input &input)
 {
-  Output obj{};
+  Output output{};
 
-  auto result = convert(input, obj);
+  auto result = convert(input, output);
   if (!result)
   {
     return std::unexpected(result.error());
   }
 
-  return {obj};
+  return {output};
 }
 
 #endif
