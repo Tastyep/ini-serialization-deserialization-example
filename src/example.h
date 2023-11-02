@@ -3,6 +3,7 @@
 
 #include <boost/describe.hpp>
 #include <string>
+#include <vector>
 
 class Numbers
 {
@@ -36,6 +37,15 @@ class Bools
   BOOST_DESCRIBE_CLASS(Bools, (), (), (), (yes, no));
 };
 
+class Lists
+{
+  public:
+
+  std::vector<int> intList;
+
+  BOOST_DESCRIBE_CLASS(Lists, (), (), (), (intList));
+};
+
 class Example
 
 {
@@ -44,8 +54,9 @@ class Example
   Numbers numbers;
   Letters letters;
   Bools   bools;
+  Lists   lists;
 
-  BOOST_DESCRIBE_CLASS(Example, (), (), (), (numbers, letters, bools));
+  BOOST_DESCRIBE_CLASS(Example, (), (), (), (numbers, letters, bools, lists));
 };
 
 #endif

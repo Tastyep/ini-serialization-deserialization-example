@@ -30,6 +30,7 @@ int main(void)
 
   example->numbers.two = 9;
   example->letters.c   = "z";
+  example->lists.intList.push_back(4);
 
   const auto newIniContent = convert<ini::Content>(*example);
 

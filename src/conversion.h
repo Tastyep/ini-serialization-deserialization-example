@@ -1,6 +1,8 @@
 #ifndef CONVERTION_H
 #define CONVERTION_H
 
+#include "string.h"
+
 #include <array>
 #include <boost/core/demangle.hpp>
 #include <boost/describe.hpp>
@@ -10,16 +12,22 @@
 #include <expected>
 #include <format>
 #include <map>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 namespace bd          = boost::describe;
 using ConversionError = std::string;
 
-template<typename T>
+template<class T>
 concept Number =
     (std::integral<T> || std::floating_point<T>)&&!std::same_as<bool, T>;
+
+template<class T>
+concept Collection = std::
+    same_as<T, std::vector<typename T::value_type, typename T::allocator_type>>;
 
 template<typename T>
 std::string typeName()
@@ -101,6 +109,49 @@ requires std::assignable_from<std::add_lvalue_reference_t<Value>, Input>
 std::expected<void, ConversionError> convert(const Input& input, Value& obj)
 {
   obj = input;
+  return {};
+}
+
+// Collections
+
+#include <iostream>
+
+std::expected<void, ConversionError> convert(std::string_view input,
+                                             Collection auto& output)
+{
+
+  for (const auto value : std::views::split(input, ','))
+  {
+    output.resize(output.size() + 1);
+    const auto& result = convert(trim(std::string_view{value}), output.back());
+    if (!result)
+    {
+      return result;
+    }
+  }
+
+  return {};
+}
+
+std::expected<void, ConversionError> convert(const Collection auto& input,
+                                             std::string&           output)
+{
+  std::string strValue;
+  for (const auto& value : input)
+  {
+    const auto result = convert(value, strValue);
+    if (!result)
+    {
+      return result;
+    }
+
+    if (!output.empty())
+    {
+      output += ", ";
+    }
+    output += strValue;
+  }
+
   return {};
 }
 
