@@ -3,26 +3,145 @@
 #include <catch2/catch_test_macros.hpp>
 #include <sstream>
 
-SCENARIO("Reading an ini content from a stream", "[ini]")
+SCENARIO("Reading content from a correctly formatted input stream")
 {
-  GIVEN("A person represented as one section and two attributes")
+  GIVEN("An input stream with correctly formatted content")
   {
-    std::stringstream file;
+    std::istringstream input(R"(
+[Section1]
+key1 = value1
+key2 = value2
 
-    file << "[Person]\n";
-    file << "name = Bob\n";
-    file << "age = 40\n";
-
-    WHEN("The content is parsed")
+[Section2]
+key3 = value3
+)");
+    WHEN("read is called")
     {
-      auto result = ini::read(file);
-
-      THEN("The Person data structure is correctly parsed")
+      auto result = ini::read(input);
+      THEN("it returns a valid Content structure")
       {
         REQUIRE(result.has_value());
-        REQUIRE(result.value().contains("Person"));
-        REQUIRE(result.value()["Person"]["name"] == "Bob");
-        REQUIRE(result.value()["Person"]["age"] == "40");
+        auto content = result.value();
+        REQUIRE(content["Section1"]["key1"] == "value1");
+        REQUIRE(content["Section1"]["key2"] == "value2");
+        REQUIRE(content["Section2"]["key3"] == "value3");
+      }
+    }
+  }
+}
+
+SCENARIO("Reading content from an empty input stream")
+{
+  GIVEN("An empty input stream")
+  {
+    std::istringstream input("");
+    WHEN("read is called")
+    {
+      auto result = ini::read(input);
+      THEN("it returns a valid but empty Content structure")
+      {
+        REQUIRE(result.has_value());
+        REQUIRE(result.value().empty());
+      }
+    }
+  }
+}
+
+SCENARIO("Reading content from an input stream missing a section name")
+{
+  GIVEN("An input stream with a key-value pair but missing section name")
+  {
+    std::istringstream input("key1 = value1");
+    WHEN("read is called")
+    {
+      auto result = ini::read(input);
+      THEN("it returns an error")
+      {
+        REQUIRE(result.error()
+                == "Missing section name when parsing line 'key1 = value1'");
+      }
+    }
+  }
+}
+
+SCENARIO("Reading content from an input stream with invalid format")
+{
+  GIVEN("An input stream with a line missing the '=' character")
+  {
+    std::istringstream input(R"(
+[Section1]
+key1 value1
+)");
+    WHEN("read is called")
+    {
+      auto result = ini::read(input);
+      THEN("it returns an error")
+      {
+        REQUIRE(result.error()
+                == "Invalid format 'key1 value1', expected 'key = value'");
+      }
+    }
+  }
+}
+
+SCENARIO("Reading content with extra whitespaces")
+{
+  GIVEN("An input stream with extra whitespaces around keys and values")
+  {
+    std::istringstream input(R"(
+[Section1]
+key1   =   value1   
+)");
+    WHEN("read is called")
+    {
+      auto result = ini::read(input);
+      THEN("it correctly trims these whitespaces")
+      {
+        REQUIRE(result.has_value());
+        auto content = result.value();
+        REQUIRE(content["Section1"]["key1"] == "value1");
+      }
+    }
+  }
+
+  GIVEN("An input stream with extra whitespaces around the section name")
+  {
+    std::istringstream input(R"(
+  [Section1]  
+key1 = value1   
+)");
+    WHEN("read is called")
+    {
+      auto result = ini::read(input);
+      THEN("it correctly trims these whitespaces")
+      {
+        REQUIRE(result.has_value());
+        auto content = result.value();
+        REQUIRE(content["Section1"]["key1"] == "value1");
+      }
+    }
+  }
+}
+
+SCENARIO("Reading content with empty lines")
+{
+  GIVEN("An input stream with empty lines")
+  {
+    std::istringstream input(R"(
+
+[Section1]
+
+key1 = value1
+
+)");
+    WHEN("read is called")
+    {
+      auto result = ini::read(input);
+      THEN("it ignores these lines and parses the rest correctly")
+      {
+        REQUIRE(result.has_value());
+        auto content = result.value();
+        REQUIRE(content["Section1"]["key1"] == "value1");
       }
     }
   }
