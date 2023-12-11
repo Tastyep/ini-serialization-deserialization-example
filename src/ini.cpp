@@ -18,6 +18,7 @@ std::expected<Content, std::string> read(std::istream& input)
   std::string line;
   while (std::getline(input, line))
   {
+    line = trim(line);
     if (line.empty())
     {
       continue;
