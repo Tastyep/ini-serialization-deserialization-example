@@ -10,15 +10,14 @@
 namespace ini
 {
 
-std::expected<Content, std::string> read(std::istream& input)
+std::expected<Content, std::string> read(File& input)
 {
   Content     content;
   std::string sectionName;
 
-  std::string line;
-  while (std::getline(input, line))
+  for (std::optional<std::string> readLine; (readLine = input.readLine());)
   {
-    line = trim(line);
+    auto line = trim(*readLine);
     if (line.empty())
     {
       continue;
@@ -51,25 +50,22 @@ std::expected<Content, std::string> read(std::istream& input)
   return content;
 }
 
-std::expected<void, std::string> write(const Content& content,
-                                       std::ostream&  file)
+void write(const Content& content, File& file)
 {
   const auto lastSectionName = std::prev(content.end())->first;
   for (const auto& [sectionName, section] : content)
   {
-    file << std::format("[{}]\n", sectionName);
+    file.writeLine(std::format("[{}]", sectionName));
     for (const auto& [key, value] : section)
     {
-      file << std::format("{} = {}\n", key, value);
+      file.writeLine(std::format("{} = {}", key, value));
     }
 
     if (sectionName != lastSectionName)
     {
-      file << std::endl;
+      file.writeLine("");
     }
   }
-
-  return {};
 }
 
 } // namespace ini
