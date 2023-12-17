@@ -1,17 +1,29 @@
-#ifndef FILE_H
-#define FILE_H
+#ifndef FILE_H_
+#define FILE_H_
 
 #include <expected>
 #include <filesystem>
-#include <istream>
-#include <memory>
-#include <ostream>
+#include <optional>
 #include <string>
+#include <string_view>
 
-std::expected<std::unique_ptr<std::istream>, std::string>
-openInputFile(const std::filesystem::path& path);
+class File
+{
+  public:
 
-std::expected<std::unique_ptr<std::ostream>, std::string>
-openOutputFile(const std::filesystem::path& path);
+  enum class OpenMode
+  {
+    read  = 1 << 0,
+    write = 1 << 1,
+  };
 
-#endif
+  public:
+
+  virtual std::expected<void, std::string>
+  open(const std::filesystem::path& path, OpenMode mode) = 0;
+
+  virtual std::optional<std::string> readLine()                       = 0;
+  virtual void                       writeLine(std::string_view line) = 0;
+};
+
+#endif // !FILE_H_
