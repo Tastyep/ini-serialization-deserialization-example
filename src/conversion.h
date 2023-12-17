@@ -172,6 +172,12 @@ convert(const std::map<std::string, Value>& input, Output& obj)
         {
           return;
         }
+        if (!input.contains(D.name))
+        {
+          result = std::unexpected(
+              std::format("Cannot find a key with the name '{}'", D.name));
+          return;
+        }
         result = convert(input.at(D.name), obj.*D.pointer);
       });
 
