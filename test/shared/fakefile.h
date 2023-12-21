@@ -10,13 +10,17 @@ class FakeFile : public File
 {
   public:
 
-  explicit FakeFile(std::string content);
+  explicit FakeFile(std::string content = {});
 
   std::expected<void, std::string> open(const std::filesystem::path& path,
                                         OpenMode mode) override;
 
   std::optional<std::string> readLine() override;
   void                       writeLine(std::string_view line) override;
+
+  public:
+
+  std::string content() const;
 
   private:
 

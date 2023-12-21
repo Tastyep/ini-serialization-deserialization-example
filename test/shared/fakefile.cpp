@@ -26,3 +26,8 @@ void FakeFile::writeLine(std::string_view line)
 {
   _stream << line << '\n';
 }
+
+std::string FakeFile::content() const
+{
+  return _stream.str();
+}
