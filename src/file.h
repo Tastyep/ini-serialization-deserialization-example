@@ -19,6 +19,7 @@ class File
 
   public:
 
+  virtual ~File() = default;
   virtual std::expected<void, std::string>
   open(const std::filesystem::path& path, OpenMode mode) = 0;
 

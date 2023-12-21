@@ -9,7 +9,7 @@ class StdFileFactory : public FileFactory
 {
   public:
 
-  std::unique_ptr<File> makeFile() const override;
+  std::shared_ptr<File> makeFile() const override;
 };
 
 #endif

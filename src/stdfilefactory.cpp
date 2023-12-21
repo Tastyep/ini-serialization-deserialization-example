@@ -2,7 +2,7 @@
 
 #include "stdfile.h"
 
-std::unique_ptr<File> StdFileFactory::makeFile() const
+std::shared_ptr<File> StdFileFactory::makeFile() const
 {
-  return std::make_unique<StdFile>();
+  return std::make_shared<StdFile>();
 }

@@ -1,15 +1,16 @@
 #ifndef FILE_FACTORY_H
 #define FILE_FACTORY_H
 
-#include "file.h"
-
 #include <memory>
+
+class File;
 
 class FileFactory
 {
   public:
 
-  virtual std::unique_ptr<File> makeFile() const = 0;
+  virtual ~FileFactory()                         = default;
+  virtual std::shared_ptr<File> makeFile() const = 0;
 };
 
 #endif
