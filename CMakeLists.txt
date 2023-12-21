@@ -14,10 +14,16 @@ set(${PROJECT_NAME}_SOURCES
     conversion.h
     example.h
     file.h
-    file.cpp
+    filefactory.h
     ini.cpp
     ini.h
-    string.h)
+    stdfile.h
+    stdfile.cpp
+    stdfilefactory.h
+    stdfilefactory.cpp
+    string.h
+    transformini.h
+    transformini.cpp)
 list(TRANSFORM ${PROJECT_NAME}_SOURCES PREPEND ${CMAKE_SOURCE_DIR}/src/)
 
 add_executable(${PROJECT_NAME})

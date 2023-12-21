@@ -1,6 +1,6 @@
 #include "src/ini.h"
 
-#include "fakefile.h"
+#include "shared/fakefile.h"
 
 #include <catch2/catch_test_macros.hpp>
 #include <sstream>
