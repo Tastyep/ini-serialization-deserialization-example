@@ -1,13 +1,13 @@
 #include "example.h"
 #include "stdfilefactory.h"
-#include "transformini.h"
+#include "transformini.hpp"
 
 #include <iostream>
 #include <memory>
 
 int main(void)
 {
-  const auto result = transformExample(//
+  const auto result = ini::transform<Example>(//
       StdFileFactory{},
       std::filesystem::path{"../asset/example.ini"},
       std::filesystem::path{"../output/example.ini"},

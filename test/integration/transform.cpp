@@ -1,6 +1,6 @@
 #include "shared/fakefile.h"
-#include "shared/uniqueptrmock.hpp"
-#include "src/transformini.h"
+#include "src/example.h"
+#include "src/transformini.hpp"
 #include "test/integration/filefactorymock.hpp"
 #include "trompeloeil.hpp"
 
@@ -21,7 +21,7 @@ SCENARIO("Converting an example structure from an input file to an output file")
 
     WHEN("The data structure is transformed")
     {
-      auto result = transformExample(
+      auto result = ini::transform<Example>(
           fileFactory, "input", "output", [](const auto& example) {});
 
       THEN("It returns a section not found error")
@@ -62,7 +62,7 @@ intList = 1, 2, 3)");
 
     WHEN("The data structure is transformed")
     {
-      auto result = transformExample(
+      auto result = ini::transform<Example>(
           fileFactory, "input", "output", [](const auto& example) {});
 
       THEN("The operation succeeds")

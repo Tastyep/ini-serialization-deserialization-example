@@ -22,8 +22,7 @@ set(${PROJECT_NAME}_SOURCES
     stdfilefactory.h
     stdfilefactory.cpp
     string.h
-    transformini.h
-    transformini.cpp)
+    transformini.hpp)
 list(TRANSFORM ${PROJECT_NAME}_SOURCES PREPEND ${CMAKE_SOURCE_DIR}/src/)
 
 add_executable(${PROJECT_NAME})

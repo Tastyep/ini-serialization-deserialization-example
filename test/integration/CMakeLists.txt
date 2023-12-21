@@ -13,7 +13,7 @@ find_package(trompeloeil REQUIRED)
 
 set(${PROJECT_NAME}_SOURCES transform.cpp filefactorymock.hpp)
 list(TRANSFORM ${PROJECT_NAME}_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/)
-list(APPEND ${PROJECT_NAME}_SOURCES ${SHARED_TEST_DIR}/fakefile.h ${SHARED_TEST_DIR}/fakefile.cpp ${SHARED_TEST_DIR}/uniqueptrmock.hpp)
+list(APPEND ${PROJECT_NAME}_SOURCES ${SHARED_TEST_DIR}/fakefile.h ${SHARED_TEST_DIR}/fakefile.cpp)
 
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_SOURCES} ${${PARENT_PROJECT}_SOURCES})

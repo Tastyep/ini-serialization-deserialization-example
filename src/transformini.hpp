@@ -1,18 +1,25 @@
-#include "transformini.h"
+#ifndef TRANSFORM_INI_H
+#define TRANSFORM_INI_H
 
 #include "conversion.h"
-#include "example.h"
 #include "file.h"
 #include "filefactory.h"
 #include "ini.h"
 
-#include <iostream>
+#include <expected>
+#include <filesystem>
+#include <functional>
+#include <memory>
+#include <string>
 
+namespace ini
+{
+template<class T>
 std::expected<void, std::string>
-transformExample(const FileFactory&                   fileFactory,
-                 const std::filesystem::path&         inputPath,
-                 const std::filesystem::path&         outputPath,
-                 const std::function<void(Example&)>& transformer)
+transform(const FileFactory&             fileFactory,
+          const std::filesystem::path&   inputPath,
+          const std::filesystem::path&   outputPath,
+          const std::function<void(T&)>& transformer)
 {
   auto inputFile  = fileFactory.makeFile();
   auto outputFile = fileFactory.makeFile();
@@ -27,15 +34,15 @@ transformExample(const FileFactory&                   fileFactory,
     return std::unexpected(std::move(iniContent.error()));
   }
 
-  auto example = convert<Example>(*iniContent);
-  if (!example)
+  auto obj = convert<T>(*iniContent);
+  if (!obj)
   {
-    return std::unexpected(std::move(example.error()));
+    return std::unexpected(std::move(obj.error()));
   }
 
-  transformer(*example);
+  transformer(*obj);
 
-  auto newIniContent = convert<ini::Content>(*example);
+  auto newIniContent = convert<ini::Content>(*obj);
   if (!newIniContent)
   {
     return std::unexpected(std::move(newIniContent.error()));
@@ -51,3 +58,7 @@ transformExample(const FileFactory&                   fileFactory,
 
   return {};
 }
+
+} // namespace ini
+
+#endif
